@@ -1,0 +1,5 @@
+C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/out/build/x64-debug/CMakeFiles/edit_cache.dir
+C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/out/build/x64-debug/CMakeFiles/rebuild_cache.dir
+C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/out/build/x64-debug/GraphicsProject/CMakeFiles/GraphicsProject.dir
+C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/out/build/x64-debug/GraphicsProject/CMakeFiles/edit_cache.dir
+C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/out/build/x64-debug/GraphicsProject/CMakeFiles/rebuild_cache.dir
