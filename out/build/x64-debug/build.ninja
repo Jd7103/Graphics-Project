@@ -185,6 +185,33 @@ build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\shader.cpp.obj: CXX_COM
   TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
   TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
 
+build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Terrain.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\Terrain.cpp || cmake_object_order_depends_target_GraphicsProject
+  DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  INCLUDES = -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\include -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\headers -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui\backends
+  OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
+  OBJECT_FILE_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir\src
+  TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
+  TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
+
+build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Model.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\Model.cpp || cmake_object_order_depends_target_GraphicsProject
+  DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  INCLUDES = -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\include -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\headers -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui\backends
+  OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
+  OBJECT_FILE_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir\src
+  TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
+  TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
+
+build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Mesh.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\Mesh.cpp || cmake_object_order_depends_target_GraphicsProject
+  DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
+  INCLUDES = -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\include -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\headers -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui\backends
+  OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
+  OBJECT_FILE_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir\src
+  TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
+  TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target GraphicsProject
@@ -193,12 +220,12 @@ build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\shader.cpp.obj: CXX_COM
 #############################################
 # Link the executable C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe
 
-build C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe: CXX_EXECUTABLE_LINKER__GraphicsProject_Debug GraphicsProject\CMakeFiles\GraphicsProject.dir\external\glad.c.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\include\stbi\stbi.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui_draw.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui_tables.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui_widgets.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\backends\imgui_impl_glfw.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\backends\imgui_impl_opengl3.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Main.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Skybox.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Camera.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\shader.cpp.obj | C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib
+build C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe: CXX_EXECUTABLE_LINKER__GraphicsProject_Debug GraphicsProject\CMakeFiles\GraphicsProject.dir\external\glad.c.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\include\stbi\stbi.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui_draw.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui_tables.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\imgui_widgets.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\backends\imgui_impl_glfw.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\imgui\backends\imgui_impl_opengl3.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Main.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Skybox.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Camera.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\shader.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Terrain.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Model.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Mesh.cpp.obj | C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\assimp-vc143-mtd.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib  C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\assimp-vc143-mtd.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
-  POST_BUILD = cd .
+  POST_BUILD = cmd.exe /C "cd /D C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\build\x64-debug\GraphicsProject && "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E copy_if_different C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject/external/DLL/assimp-vc143-mtd.dll C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/out"
   PRE_LINK = cd .
   TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
   TARGET_FILE = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe

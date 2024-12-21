@@ -44,18 +44,18 @@ unsigned int skyboxIndices[] = {
 	6, 2, 3
 };
 
-GLuint skyboxVAO, skyboxVBO, skyboxEBO, shaderProgram, cubemapTexture;
+GLuint skyboxVAO, skyboxVBO, skyboxEBO, skyboxShader, cubemapTexture;
 
 Skybox::Skybox() {}
 
-void Skybox::SkyboxInit() {
+void Skybox::init() {
 
 	string vert = string(PROJECT_ROOT) + "/src/shaders/skybox.vert";
 	string frag = string(PROJECT_ROOT) + "/src/shaders/skybox.frag";
-	shaderProgram = LoadShadersFromFile(vert.c_str(), frag.c_str());
+	skyboxShader = LoadShadersFromFile(vert.c_str(), frag.c_str());
 
-	glUseProgram(shaderProgram); 
-	glUniform1i(glGetUniformLocation(shaderProgram, "skybox"), 0);
+	glUseProgram(skyboxShader); 
+	glUniform1i(glGetUniformLocation(skyboxShader, "textureSampler"), 0);
 
 	glGenVertexArrays(1, &skyboxVAO);
 	glGenBuffers(1, &skyboxVBO);
@@ -95,17 +95,16 @@ void Skybox::SkyboxInit() {
 	}
 }
 
-void Skybox::renderSkybox(Camera camera, unsigned int width, unsigned int height) {
+void Skybox::render(Camera camera, unsigned int width, unsigned int height, glm::mat4 view, glm::mat4 projection) {
 	glDepthFunc(GL_LEQUAL);
+	glCullFace(GL_FRONT);
 
-	glUseProgram(shaderProgram);
+	glUseProgram(skyboxShader);
 
-	glm::mat4 view = glm::mat4(1.0f);
-	glm::mat4 projection = glm::mat4(1.0f);
-	view = glm::mat4(glm::mat3(glm::lookAt(camera.Position, camera.Position + camera.Orientation, camera.Up)));
-	projection = glm::perspective(glm::radians(90.0f), (float)width / height, 0.5f, 2500.0f);
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+	view = glm::mat4(glm::mat3(view));
+
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader, "view"), 1, GL_FALSE, glm::value_ptr(view));
+	glUniformMatrix4fv(glGetUniformLocation(skyboxShader, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
 	glBindVertexArray(skyboxVAO);
 	glActiveTexture(GL_TEXTURE0);
@@ -114,4 +113,9 @@ void Skybox::renderSkybox(Camera camera, unsigned int width, unsigned int height
 	glBindVertexArray(0);
 
 	glDepthFunc(GL_LESS);
+	glCullFace(GL_BACK);
+}
+
+void Skybox::deleteBuffers() {
+
 }

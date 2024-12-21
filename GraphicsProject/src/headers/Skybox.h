@@ -7,8 +7,7 @@
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
 
-#include <tinygltf/tiny_gltf.h>
-#include <tinygltf/stb_image.h>
+#include <stbi/stb_image.h>
 
 #include <string>
 #include <iostream>
@@ -21,7 +20,8 @@ class Skybox
 public:
 	Skybox();
 
-	void SkyboxInit();
-	void renderSkybox(Camera camera, unsigned int width, unsigned int height);
+	void init();
+	void render(Camera camera, unsigned int width, unsigned int height, glm::mat4 view, glm::mat4 projection);
+	void deleteBuffers();
 };
 #endif

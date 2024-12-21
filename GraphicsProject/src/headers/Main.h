@@ -1,8 +1,16 @@
-﻿// GraphicsProject.h : Include file for standard system include files,
-// or project specific include files.
-
-#pragma once
+﻿#pragma once
 
 #include <iostream>
+#include "imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
 
-// TODO: Reference additional headers your program requires here.
+#include "Camera.h"
+#include "Skybox.h"
+#include "Terrain.h"
+#include "Model.h"
+#include "Mesh.h"
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>

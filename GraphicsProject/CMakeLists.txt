@@ -32,10 +32,14 @@ set(SOURCES
 include_directories(${INCLUDE_DIR} ${HEADER_DIR} ${IMGUI_DIR} ${IMGUI_DIR}/backends)
 
 # Add the executable
-add_executable(GraphicsProject ${SOURCES} "src/Skybox.cpp" "src/Camera.cpp" "src/shader.cpp")
+add_executable(GraphicsProject ${SOURCES} "src/Skybox.cpp" "src/Camera.cpp" "src/shader.cpp" "src/Terrain.cpp"  "src/Model.cpp" "src/Mesh.cpp")
 
 # Link libraries
-target_link_libraries(GraphicsProject "${LIB_DIR}/glfw3.lib" opengl32)
+target_link_libraries(GraphicsProject "${LIB_DIR}/glfw3.lib" "${LIB_DIR}/assimp-vc143-mtd.lib" opengl32)
+
+add_custom_command(TARGET GraphicsProject POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${PROJECT_ROOT}/external/DLL/assimp-vc143-mtd.dll" $<TARGET_FILE_DIR:GraphicsProject>)
 
 # Output binary to the 'out' directory
 set_target_properties(GraphicsProject PROPERTIES

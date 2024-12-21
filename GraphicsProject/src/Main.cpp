@@ -1,18 +1,7 @@
-﻿#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
+﻿#include "Main.h"
 
-#include "Camera.h"
-#include "Skybox.h"
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <tinygltf/tiny_gltf.h>
-#include <iostream>
-
-const unsigned int width = 1280;
-const unsigned int height = 720;
+const unsigned int width = 1920;
+const unsigned int height = 1080;
 
 int main()
 {
@@ -22,6 +11,10 @@ int main()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	#ifdef __APPLE__
+		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	#endif
 
 	GLFWwindow* window = glfwCreateWindow(width, height, "Graphics Project", NULL, NULL);
 
@@ -40,7 +33,7 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
 
 	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -50,8 +43,19 @@ int main()
 	double timeDiff;
 	unsigned int counter = 0;
 
+	glm::vec3 lightDir = glm::vec3(-0.5f, -0.7f, -0.5f);
+
 	Skybox skybox = Skybox();
-	skybox.SkyboxInit();
+	skybox.init();
+
+	Model model = Model(string(PROJECT_ROOT) + "/assets/models/city/small_buildingC.glb");
+
+	string vert = string(PROJECT_ROOT) + "/src/shaders/default.vert";
+	string frag = string(PROJECT_ROOT) + "/src/shaders/default.frag";
+	GLuint shader = LoadShadersFromFile(vert.c_str(), frag.c_str());
+
+	Terrain terrain = Terrain();
+	terrain.initPlanar(shader);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -63,7 +67,7 @@ int main()
 		{
 			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
 			std::string ms = std::to_string((timeDiff / counter) * 1000);
-			std::string newTitle = "Graphics Project - " + FPS + "FPS / " + ms + "ms";
+			std::string newTitle = "Graphics Project : " + FPS + "FPS / " + ms + "ms";
 			glfwSetWindowTitle(window, newTitle.c_str());
 
 			prevTime = currentTime;
@@ -74,9 +78,20 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		camera.Inputs(window);
-		camera.updateMatrix(90.0f, 0.1f, 100.0f);
+		glm::mat4 view = glm::lookAt(camera.position, camera.position + camera.orientation, camera.up);
+		glm::mat4 projection = glm::perspective(glm::radians(90.0f), (float)width / height, 0.5f, 2500.0f);
 
-		skybox.renderSkybox(camera, width, height);
+		//Model
+		glm::vec3 translate = glm::vec3(250.0f, -50.0f, 0.0f);
+		glm::vec3 scale = glm::vec3(100.0f, 100.0f, 100.0f);
+		glm::vec3 rotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+		float rotateAngle = 35;
+		model.render(shader, camera, height, width, view, projection, lightDir, scale, translate, rotateAngle, rotateAxis);
+		//Model
+
+		terrain.renderPlanar(shader, camera, width, height, view, projection, lightDir);
+
+		skybox.render(camera, width, height, view, projection);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
