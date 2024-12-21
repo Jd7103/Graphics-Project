@@ -86,6 +86,7 @@ int main()
 		glm::vec3 scale = glm::vec3(100.0f, 100.0f, 100.0f);
 		glm::vec3 rotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
 		float rotateAngle = 35;
+
 		model.render(shader, camera, height, width, view, projection, lightDir, scale, translate, rotateAngle, rotateAxis);
 		//Model
 
