@@ -12,16 +12,49 @@
 #include <string>
 #include <iostream>
 
-#include "shader.h"
+#include "Shader.h"
 #include "Camera.h"
+#include "Model.h"
 
-class Terrain
-{
+class Terrain {
+
 public:
-	Terrain();
 
-	void initPlanar(GLuint& shader);
-	void renderPlanar(GLuint& shader, Camera camera, unsigned int width, unsigned int height,
-		glm::mat4 view, glm::mat4 projection, glm::vec3 lightDir);
+	Terrain(Shader& shader);
+	void render(Shader& shader);
+	void deleteBuffers();
+
+private:
+
+    float originVertices[12] = {
+        -500.0f, -50.0f,  500.0f,
+         500.0f, -50.0f,  500.0f,
+         500.0f, -50.0f, -500.0f,
+        -500.0f, -50.0f, -500.0f
+    };
+
+    GLuint originIndices[6] = {
+        0, 2, 3,
+        2, 0, 1
+    };
+
+    float originNormals[12]{
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f
+    };
+
+    float tileFactor = 100.0f;
+
+    float originUVs[8] = {
+        0.0f, (500.0f / 1000.0f) * tileFactor,
+        (259.0f / 1000.0f) * tileFactor, (500.0f / 1000.0f) * tileFactor,
+        (259.0f / 1000.0f) * tileFactor, 0.0f,
+        0.0f, 0.0f
+    };
+
+	GLuint terrainVAO, terrainVBO, terrainEBO, textureID, terrainNormal, terrainUV;
+
 };
 #endif

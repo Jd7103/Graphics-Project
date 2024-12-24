@@ -1,16 +1,25 @@
 ﻿#pragma once
 
-#include <iostream>
-#include "imgui.h"
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_opengl3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <stbi/stb_image_write.h>
+
+#include "Shader.h"
 #include "Camera.h"
 #include "Skybox.h"
 #include "Terrain.h"
-#include "Model.h"
-#include "Mesh.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
+#include <iostream>
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void processInput(GLFWwindow* window);
+
+void initDepthFBO();
+static void saveDepthTexture(GLuint fbo, std::string filename);
+

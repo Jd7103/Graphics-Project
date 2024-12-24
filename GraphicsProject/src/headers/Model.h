@@ -10,9 +10,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include "Mesh.h"
-#include "shader.h"
-#include "Camera.h"
+#include <Mesh.h>
+#include <Shader.h>
 
 #include <string>
 #include <fstream>
@@ -20,25 +19,26 @@
 #include <iostream>
 #include <map>
 #include <vector>
-
 using namespace std;
+
+GLuint TextureFromFile(const char* path, const string& directory, bool gamma = false);
 
 class Model
 {
 public:
-    vector<Texture> textures_loaded;
+    
+    vector<Texture> textures_loaded;	
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
 
-    Model(string const& path, bool gamma = false) : gammaCorrection(gamma) {
-        loadModel(path);
-    }
+    Model(string const& path, bool gamma = false);
 
-    void render(GLuint& shader, Camera camera, int height, int width, glm::mat4 view, glm::mat4 projection, glm::vec3 lightDir,
-        glm::vec3 scale, glm::vec3 translate, float rotateAngle, glm::vec3 rotateAxis);
+    void render(Shader& shader);
 
 private:
+
+    const aiScene* scene;
 
     void loadModel(string const& path);
 
@@ -47,7 +47,5 @@ private:
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
     vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
-
-    GLuint TextureFromFile(const char* path, const string& directory, bool gamma = false);
 };
 #endif
