@@ -31,10 +31,11 @@ public:
     vector<Mesh>    meshes;
     string directory;
     bool gammaCorrection;
+    glm::vec3 diffuseColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
     Model(string const& path, bool gamma = false);
 
-    void render(Shader& shader);
+    void render(Shader& shader, bool instanced = false, size_t instanceCount = 0);
 
 private:
 

@@ -4,7 +4,7 @@
 const unsigned int SCREEN_WIDTH = 1920;
 const unsigned int SCREEN_HEIGHT = 1080;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), 0.5f, 2500.0f, SCREEN_HEIGHT, SCREEN_WIDTH);
+Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, 2500.0f, SCREEN_HEIGHT, SCREEN_WIDTH);
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -74,11 +74,13 @@ int main() {
     frag = std::string(PROJECT_ROOT) + "/src/shaders/default.frag";
 
     Shader shader(vert.c_str(), frag.c_str());
-    Terrain originPlane(shader, glm::vec3(1.0f));
+    Terrain originPlane(shader);
 
-    //std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/futureCity/Building2/scene.gltf";
-    std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperB.glb";
+    std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/spire/spire.gltf";
     Model model(modelPath.c_str());
+
+    modelPath = std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb";
+    //Model building(modelPath.c_str());
 
     //Shadow Mapping
     initDepthFBO();
@@ -91,6 +93,17 @@ int main() {
     shader.use();
     shader.setVec3("lightDir", lightDir);
     shader.setInt("depthMap", 1);
+
+    std::vector<std::string> buildingPaths = {
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperA.glb",
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperB.glb",
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperC.glb",
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperD.glb",
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperE.glb",
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb"
+    };
+
+    Generator generator(shader, modelPath);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -110,27 +123,28 @@ int main() {
         }
 
         processInput(window);
+        generator.update(camera);
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-        glm::vec3 translate = glm::vec3(0.0f, -50.0f, -200.0f);
-        glm::vec3 scale = glm::vec3(100.0f, 100.0f, 100.0f);
-        glm::vec3 rotateAxis = glm::vec3(0.0f, 1.0f, 0.0f);
-        float rotateAngle = 35;
+        glm::vec3 translate = glm::vec3(0.0f, 55.0f, -5.0f);
+        glm::vec3 scale = glm::vec3(10.0f, 10.0f, 10.0f);
+        glm::vec3 rotateAxis = glm::vec3(0.0f, 0.0f, 1.0f);
+        float rotateAngle = 0;
 
-        glm::mat4 modelMatrixTransformed = glm::translate(modelMatrix, translate);
-        modelMatrixTransformed = glm::scale(modelMatrixTransformed, scale);
+        glm::mat4 modelMatrixTransformed = glm::scale(modelMatrix, scale);
         modelMatrixTransformed = glm::rotate(modelMatrixTransformed, glm::radians(rotateAngle), rotateAxis);
+        modelMatrixTransformed = glm::translate(modelMatrixTransformed, translate);
 
         //Shadow Pass
         depthShader.use();
 
         float near_plane = 700.0f, far_plane = 2000.0f;
         glm::vec3 lightPosition = camera.Position - lightDir * 1000.0f;
-        glm::mat4 lightProjection = glm::ortho(-1000.0f, 1000.0f, -1000.0f, 1000.0f, near_plane, far_plane);
+        glm::mat4 lightProjection = glm::ortho(-2000.0f, 2000.0f, -2000.0f, 2000.0f, near_plane, far_plane);
         glm::mat4 lightView = glm::lookAt(lightPosition, camera.Position, glm::vec3(0.0, 1.0, 0.0));
         glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -141,11 +155,7 @@ int main() {
         glClear(GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_FRONT);
 
-        depthShader.setMat4("model", modelMatrix);
-        originPlane.render(depthShader, glm::vec3(1.0f));
-
-        depthShader.setMat4("model", modelMatrixTransformed);
-        model.render(depthShader);
+        generator.render(depthShader);
 
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -170,19 +180,21 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthMap);
 
-        shader.setInt("useTexture", 1);
-
-        originPlane.render(shader, glm::vec3(1.0f));
+        //originPlane.render(shader);
 
         //models
+        //shader.setInt("useTexture", 0);
+
+        //shader.setMat4("model", modelMatrixTransformed);
+        //model.render(shader);
+
+        //models
+
         shader.setInt("useTexture", 0);
-
-        shader.setMat4("model", modelMatrixTransformed);
-        model.render(shader);
-
-        //models
+        generator.render(shader);
 
         skybox.render(skyboxShader, camera);
+
         //Regular
 
         glfwSwapBuffers(window);

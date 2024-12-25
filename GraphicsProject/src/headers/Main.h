@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Skybox.h"
 #include "Terrain.h"
+#include "Generator.h"
 
 #include <iostream>
 

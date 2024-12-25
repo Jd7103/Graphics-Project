@@ -20,12 +20,12 @@ void Mesh::render(Shader& shader) {
     unsigned int normalNr = 1;
     unsigned int heightNr = 1;
 
-    for (unsigned int i = 0; i < textures.size(); i++) {
+    for (unsigned int i = 2; i < textures.size() + 2; i++) {
 
         glActiveTexture(GL_TEXTURE0 + i);
 
         string number;
-        string name = textures[i].type;
+        string name = textures[i-2].type;
 
         if (name == "texture_diffuse")
             number = std::to_string(diffuseNr++);
@@ -37,7 +37,7 @@ void Mesh::render(Shader& shader) {
             number = std::to_string(heightNr++);
 
         glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-        glBindTexture(GL_TEXTURE_2D, textures[i].id);
+        glBindTexture(GL_TEXTURE_2D, textures[i-2].id);
 
     }
 

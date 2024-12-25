@@ -57,9 +57,9 @@ void Camera::processKeyboard(Camera_Movement direction) {
     if (direction == DOWN)
         Position -= Up * MovementSpeed;
     if (direction == FAST)
-        MovementSpeed = 0.8f;
+        MovementSpeed = 2.0f;
     if (direction == SLOW)
-        MovementSpeed = 0.3f;
+        MovementSpeed = 1.0f;
 
 }
 

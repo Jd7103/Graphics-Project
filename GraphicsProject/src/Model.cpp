@@ -6,11 +6,46 @@ Model::Model(string const& path, bool gamma) : gammaCorrection(gamma) {
 
 }
 
-void Model::render(Shader& shader) {
+void Model::render(Shader& shader, bool instanced, size_t instanceCount) {
+    // IMPORTANT: Set the diffuse color uniform for each mesh
+    for (GLuint i = 0; i < meshes.size(); i++) {
+        // Set the diffuse color for this mesh
+        shader.setVec3("diffuseColour", meshes[i].diffuseColor);
 
-    for (GLuint i = 0; i < meshes.size(); i++)
-        meshes[i].render(shader);
+        // Handle textures if they exist
+        unsigned int diffuseNr = 1;
+        unsigned int specularNr = 1;
 
+        for (unsigned int j = 0; j < meshes[i].textures.size(); j++) {
+            glActiveTexture(GL_TEXTURE0 + j);
+            string number;
+            string name = meshes[i].textures[j].type;
+            if (name == "texture_diffuse")
+                number = std::to_string(diffuseNr++);
+            else if (name == "texture_specular")
+                number = std::to_string(specularNr++);
+
+            shader.setInt((name + number).c_str(), j);
+            glBindTexture(GL_TEXTURE_2D, meshes[i].textures[j].id);
+        }
+
+        // Set useTexture based on whether we have textures
+        shader.setInt("useTexture", meshes[i].textures.empty() ? 0 : 2);
+
+        // Render the mesh
+        glBindVertexArray(meshes[i].VAO);
+        if (instanced) {
+            glDrawElementsInstanced(GL_TRIANGLES, meshes[i].indices.size(), GL_UNSIGNED_INT, 0, instanceCount);
+        }
+        else {
+            glDrawElements(GL_TRIANGLES, meshes[i].indices.size(), GL_UNSIGNED_INT, 0);
+        }
+        glBindVertexArray(0);
+    }
+
+    // Reset to default
+    glActiveTexture(GL_TEXTURE0);
+    shader.setInt("useTexture", 0);
 }
 
 void Model::loadModel(string const& path) {
@@ -106,27 +141,31 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    glm::vec3 diffuseColor(1.0f, 1.0f, 1.0f);
-
-    aiColor4D color;
-    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &color)) {
-        diffuseColor = glm::vec3(color.r, color.g, color.b);
+    // Get diffuse color
+    aiColor4D diffColor(1.0f, 1.0f, 1.0f, 1.0f); // Default white
+    if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffColor)) {
+        // Color found in material
+        diffuseColor = glm::vec3(diffColor.r, diffColor.g, diffColor.b);
+    }
+    else {
+        // Try to get color from diffuse texture if available
+        if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+            diffuseColor = glm::vec3(1.0f); // Use white if we have a diffuse texture
+        }
+        else {
+            // No color in material and no diffuse texture, use a default color
+            diffuseColor = glm::vec3(0.8f, 0.8f, 0.8f);
+        }
     }
 
+    // Load textures
     vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
     vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-    std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, "texture_normal");
-    textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
-
-    std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
-    textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
     return Mesh(vertices, indices, textures, diffuseColor);
-
 }
 
 /*
@@ -171,9 +210,11 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type,
         aiString str;
         mat->GetTexture(type, i, &str);
 
-        if (str.data[0] == '*') { 
-            const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(str.C_Str());
-            if (embeddedTexture) {
+        cout << i << endl;
+
+        const aiTexture* embeddedTexture = scene->GetEmbeddedTexture(str.C_Str());
+        
+        if (embeddedTexture) {
                 GLuint textureID;
                 glGenTextures(1, &textureID);
 
@@ -194,13 +235,15 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type,
                 texture.type = typeName;
                 texture.path = str.C_Str();
                 textures.push_back(texture);
-            }
         }
         else { 
             Texture texture;
             texture.id = TextureFromFile(str.C_Str(), this->directory);
             texture.type = typeName;
             texture.path = str.C_Str();
+
+            cout << texture.path << endl;
+
             textures.push_back(texture);
         }
     }
