@@ -4,7 +4,7 @@
 const unsigned int SCREEN_WIDTH = 1920;
 const unsigned int SCREEN_HEIGHT = 1080;
 
-Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, 2500.0f, SCREEN_HEIGHT, SCREEN_WIDTH);
+Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, 4000.0f, SCREEN_HEIGHT, SCREEN_WIDTH);
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -76,10 +76,10 @@ int main() {
     Shader shader(vert.c_str(), frag.c_str());
     Terrain originPlane(shader);
 
-    std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/spire/spire.gltf";
-    Model model(modelPath.c_str());
+    //std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/spire/spire.gltf";
+    //Model model(modelPath.c_str());
 
-    modelPath = std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb";
+    std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb";
     //Model building(modelPath.c_str());
 
     //Shadow Mapping
@@ -88,6 +88,10 @@ int main() {
     vert = std::string(PROJECT_ROOT) + "/src/shaders/depth.vert";
     frag = std::string(PROJECT_ROOT) + "/src/shaders/depth.frag";
     Shader depthShader(vert.c_str(), frag.c_str());
+
+    vert = std::string(PROJECT_ROOT) + "/src/shaders/spawnDepth.vert";
+    frag = std::string(PROJECT_ROOT) + "/src/shaders/spawnDepth.frag";
+    Shader spawnDepth(vert.c_str(), frag.c_str());
     //Shadow Mapping
 
     shader.use();
@@ -97,13 +101,32 @@ int main() {
     std::vector<std::string> buildingPaths = {
     std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperA.glb",
     std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperB.glb",
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperC.glb",
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperD.glb",
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperE.glb",
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb"
+    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperC.glb"
+    //std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperD.glb",
+    //std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperE.glb",
+    //std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb"
     };
 
-    Generator generator(shader, modelPath);
+    //modelPath = std::string(PROJECT_ROOT) + "/assets/models/spire/spire.gltf";
+
+    vert = std::string(PROJECT_ROOT) + "/src/shaders/spawn.vert";
+    frag = std::string(PROJECT_ROOT) + "/src/shaders/spawn.frag";
+    Shader spawnShader(vert.c_str(), frag.c_str());
+
+    spawnShader.use();
+    spawnShader.setVec3("lightDir", lightDir);
+    spawnShader.setInt("depthMap", 1);
+
+    Spawn spawn(spawnShader, modelPath);
+    Generator generator(shader, spawnShader, buildingPaths[2]);
+
+    //vert = std::string(PROJECT_ROOT) + "/src/shaders/sph.vert";
+    //frag = std::string(PROJECT_ROOT) + "/src/shaders/sph.frag";
+    //std::unique_ptr<SPH> sphSystem = std::make_unique<SPH>(vert, frag, 15.0f);
+    
+    modelPath = std::string(PROJECT_ROOT) + "/assets/models/gull.glb";
+    BoidManager boidManager(modelPath, shader);
+    boidManager.initialize(100, 500.0f);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -123,7 +146,9 @@ int main() {
         }
 
         processInput(window);
+
         generator.update(camera);
+        boidManager.update(min(deltaTime, 0.08f));
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -150,12 +175,18 @@ int main() {
 
         depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
+        spawnDepth.use();
+        spawnDepth.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+        spawnDepth.setMat4("model", glm::mat4(1.0f));
+
         glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
         glViewport(0, 0, depthMapResolution, depthMapResolution);
         glClear(GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_FRONT);
 
-        generator.render(depthShader);
+        generator.render(depthShader, spawnDepth);
+        boidManager.render(depthShader);
+        //spawn.render(depthShader);
 
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -180,18 +211,28 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, depthMap);
 
-        //originPlane.render(shader);
+        spawnShader.use();
+     
+        spawnShader.setMat4("model", modelMatrix);
+        spawnShader.setMat4("view", camera.viewMatrix());
+        spawnShader.setMat4("projection", camera.projectionMatrix());
+        spawnShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+       
+        spawnShader.setVec3("viewPosition", camera.Position);
+        spawnShader.setVec3("lightPosition", lightPosition);
 
-        //models
-        //shader.setInt("useTexture", 0);
+        //glActiveTexture(GL_TEXTURE1);
+       // glBindTexture(GL_TEXTURE_2D, depthMap);
 
-        //shader.setMat4("model", modelMatrixTransformed);
-        //model.render(shader);
-
-        //models
 
         shader.setInt("useTexture", 0);
-        generator.render(shader);
+        generator.render(shader, spawnShader);
+
+        boidManager.render(shader);
+
+
+        //sphSystem->update(deltaTime);
+        //sphSystem->render(camera.viewMatrix(), camera.projectionMatrix());
 
         skybox.render(skyboxShader, camera);
 

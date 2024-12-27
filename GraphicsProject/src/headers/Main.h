@@ -13,6 +13,10 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Generator.h"
+#include "Illumination.h"
+#include "SPH.h"
+#include "Spawn.h"
+#include "Boid.h"
 
 #include <iostream>
 

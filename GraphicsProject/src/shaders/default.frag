@@ -21,7 +21,7 @@ uniform int useTexture;
 
 // Constants for Blinn-Phong shading
 const float AMBIENT_STRENGTH = 0.05;
-const float DIFFUSE_STRENGTH = 0.5;
+const float DIFFUSE_STRENGTH = 0.2;
 const float SPECULAR_STRENGTH = 0.2;
 const float SHININESS = 32.0;
 
