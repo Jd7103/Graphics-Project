@@ -8,6 +8,7 @@
 #include <memory>
 #include <unordered_map>
 #include <random>
+#include <string>
 #include "Shader.h"
 #include "Model.h"
 #include "Camera.h"
@@ -24,9 +25,9 @@ class Generator {
 
 public:
 
-    Generator(Shader& shader, const std::string& buildingModelPath);
+    Generator(Shader& shader, Shader& spawnShader, const std::string& buildingModelPath);
     void update(const Camera& camera);
-    void render(Shader& shader);
+    void render(Shader& shader, Shader& spawnShader);
     ~Generator();
 
 private:
@@ -53,6 +54,7 @@ private:
     static constexpr int VIEW_DISTANCE = 4;
 
     Shader& shader;
+    Shader& spawnShader;
     std::shared_ptr<Model> buildingModel;
     std::unique_ptr<Terrain> terrainTemplate;
 
