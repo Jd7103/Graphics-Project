@@ -18,9 +18,10 @@
 class Terrain {
 public:
     Terrain(Shader& shader);
-    void render(Shader& shader);
     void renderInstanced(Shader& shader, const std::vector<glm::mat4>& modelMatrices);
+    void renderHeightmap(Shader& shader);
     void setupInstancedRendering(size_t maxInstances);
+    void generateHeightmapMesh(int resolution = 100);
     void deleteBuffers();
 
 private:
@@ -54,5 +55,18 @@ private:
 
     GLuint terrainVAO, terrainVBO, terrainEBO, textureID;
     GLuint terrainNormal, terrainUV, instanceVBO;
+
+    //Perlin
+
+    GLuint heightmapVAO, heightmapVBO, heightmapEBO;
+    GLuint heightmapNormal, heightmapUV;
+    unsigned int heightmapIndexCount;
+
+    float fade(float t);
+    float lerp(float a, float b, float t);
+    float grad(int hash, float x, float y);
+    float noise(float x, float y);
+    float octaveNoise(float x, float y, int octaves, float persistence);
+    std::vector<float> generateHeightMap(int resolution);
 };
 #endif
