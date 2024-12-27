@@ -1,6 +1,6 @@
 #include "Generator.h"
 
-Generator::Generator(Shader& shader, const std::string& buildingModelPath) : shader(shader) {
+Generator::Generator(Shader& shader, Shader& spawnShader, const std::string& buildingModelPath) : shader(shader), spawnShader(spawnShader) {
 
     buildingModel = std::make_shared<Model>(buildingModelPath);
     terrainTemplate = std::make_unique<Terrain>(shader);
@@ -50,7 +50,11 @@ void Generator::generateChunk(const glm::ivec2& position) {
     chunk.position = position;
     chunk.seed = generateChunkSeed(position);
 
-    if (chunk.position != glm::ivec2(0,0)) {
+    if (chunk.position == glm::ivec2(0, 0)) {
+        // Generate heightmap terrain for origin
+        terrainTemplate->generateHeightmapMesh();
+    } 
+    else {
 
         // Buildings on Edge are Closer to the Edge for Seamless Chunk Transitions
         const float halfChunkSize = CHUNK_SIZE / 2.0f;
@@ -141,7 +145,10 @@ void Generator::update(const Camera& camera) {
 
         // 2D Chunk Coords (i.e. 0,0 is the origin chunk) to World Space Coords
         glm::mat4 chunkMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x * CHUNK_SIZE, 0.0f, pos.y * CHUNK_SIZE));
-        terrainMatrices.push_back(chunkMatrix);
+
+        if (pos != glm::ivec2(0, 0)) {
+            terrainMatrices.push_back(chunkMatrix);
+        }
 
         // Building Chunk-Relative Coords to World Space Coords
         for (const auto& building : chunk.buildings) {
@@ -155,7 +162,7 @@ void Generator::update(const Camera& camera) {
     }
 }
 
-void Generator::render(Shader& shader) {
+void Generator::render(Shader& shader, Shader& spawnShader) {
     
     // Buildings
     glBindBuffer(GL_ARRAY_BUFFER, buildingInstanceVBO);
@@ -174,7 +181,14 @@ void Generator::render(Shader& shader) {
         terrainMatrices.size() * sizeof(glm::mat4),
         terrainMatrices.data());
 
+    auto originChunk = chunks.find(glm::ivec2(0, 0));
+    if (originChunk != chunks.end()) {
+        spawnShader.use();
+        terrainTemplate->renderHeightmap(spawnShader);
+    }
+
     if (!terrainMatrices.empty())
+        shader.use();
         terrainTemplate->renderInstanced(shader, terrainMatrices);
 }
 
