@@ -23,8 +23,8 @@ using namespace std;
 
 GLuint TextureFromFile(const char* path, const string& directory, bool gamma = false);
 
-class Model
-{
+class Model {
+
 public:
     
     vector<Texture> textures_loaded;	
@@ -48,5 +48,6 @@ private:
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
     vector<Texture> loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName);
+
 };
 #endif

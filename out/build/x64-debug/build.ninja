@@ -248,33 +248,6 @@ build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Generator.cpp.obj: CXX_
   TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
   TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
 
-build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Illumination.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\Illumination.cpp || cmake_object_order_depends_target_GraphicsProject
-  DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\include -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\headers -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui\backends
-  OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
-  OBJECT_FILE_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir\src
-  TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
-  TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
-
-build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\SPH.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\SPH.cpp || cmake_object_order_depends_target_GraphicsProject
-  DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\include -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\headers -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui\backends
-  OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
-  OBJECT_FILE_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir\src
-  TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
-  TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
-
-build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Spawn.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\Spawn.cpp || cmake_object_order_depends_target_GraphicsProject
-  DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
-  INCLUDES = -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\include -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\headers -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui -IC:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\imgui\backends
-  OBJECT_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir
-  OBJECT_FILE_DIR = GraphicsProject\CMakeFiles\GraphicsProject.dir\src
-  TARGET_COMPILE_PDB = GraphicsProject\CMakeFiles\GraphicsProject.dir\
-  TARGET_PDB = C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.pdb
-
 build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Boid.cpp.obj: CXX_COMPILER__GraphicsProject_Debug C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\src\Boid.cpp || cmake_object_order_depends_target_GraphicsProject
   DEFINES = -DPROJECT_ROOT=\"C:/Root/College/Year-4/Graphics/Assignments/GraphicsProject/GraphicsProject\"
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
@@ -292,7 +265,7 @@ build GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Boid.cpp.obj: CXX_COMPI
 #############################################
 # Link the executable C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe
 
-build C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe: CXX_EXECUTABLE_LINKER__GraphicsProject_Debug GraphicsProject\CMakeFiles\GraphicsProject.dir\external\glad.c.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\include\stbi\stbi.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Main.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Camera.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Shader.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Mesh.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Model.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Skybox.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Terrain.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Generator.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Illumination.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\SPH.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Spawn.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Boid.cpp.obj | GraphicsProject\imgui.lib C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\assimp-vc143-mtd.lib || GraphicsProject\imgui.lib
+build C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\out\GraphicsProject.exe: CXX_EXECUTABLE_LINKER__GraphicsProject_Debug GraphicsProject\CMakeFiles\GraphicsProject.dir\external\glad.c.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\external\include\stbi\stbi.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Main.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Camera.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Shader.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Mesh.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Model.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Skybox.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Terrain.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Generator.cpp.obj GraphicsProject\CMakeFiles\GraphicsProject.dir\src\Boid.cpp.obj | GraphicsProject\imgui.lib C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib C$:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\assimp-vc143-mtd.lib || GraphicsProject\imgui.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Zi /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = GraphicsProject\imgui.lib  C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\glfw3.lib  C:\Root\College\Year-4\Graphics\Assignments\GraphicsProject\GraphicsProject\external\lib\assimp-vc143-mtd.lib  opengl32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

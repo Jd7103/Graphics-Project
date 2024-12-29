@@ -1,5 +1,6 @@
 #include "Model.h"
 
+//Attrib: Adapted from LearnOpenGL Model Loading Template, with some Alterations to Work for Embedded Textures and Instancing
 Model::Model(string const& path, bool gamma) : gammaCorrection(gamma) {
 
     loadModel(path);
@@ -7,12 +8,11 @@ Model::Model(string const& path, bool gamma) : gammaCorrection(gamma) {
 }
 
 void Model::render(Shader& shader, bool instanced, size_t instanceCount) {
-    // IMPORTANT: Set the diffuse color uniform for each mesh
+    
     for (GLuint i = 0; i < meshes.size(); i++) {
-        // Set the diffuse color for this mesh
+        
         shader.setVec3("diffuseColour", meshes[i].diffuseColor);
 
-        // Handle textures if they exist
         unsigned int diffuseNr = 1;
         unsigned int specularNr = 1;
 
@@ -29,10 +29,8 @@ void Model::render(Shader& shader, bool instanced, size_t instanceCount) {
             glBindTexture(GL_TEXTURE_2D, meshes[i].textures[j].id);
         }
 
-        // Set useTexture based on whether we have textures
         shader.setInt("useTexture", meshes[i].textures.empty() ? 0 : 2);
 
-        // Render the mesh
         glBindVertexArray(meshes[i].VAO);
         if (instanced) {
             glDrawElementsInstanced(GL_TRIANGLES, meshes[i].indices.size(), GL_UNSIGNED_INT, 0, instanceCount);
@@ -43,7 +41,6 @@ void Model::render(Shader& shader, bool instanced, size_t instanceCount) {
         glBindVertexArray(0);
     }
 
-    // Reset to default
     glActiveTexture(GL_TEXTURE0);
     shader.setInt("useTexture", 0);
 }
@@ -141,24 +138,22 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-    // Get diffuse color
-    aiColor4D diffColor(1.0f, 1.0f, 1.0f, 1.0f); // Default white
+    aiColor4D diffColor(1.0f, 1.0f, 1.0f, 1.0f); 
     if (AI_SUCCESS == aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffColor)) {
-        // Color found in material
+     
         diffuseColor = glm::vec3(diffColor.r, diffColor.g, diffColor.b);
     }
     else {
-        // Try to get color from diffuse texture if available
+      
         if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-            diffuseColor = glm::vec3(1.0f); // Use white if we have a diffuse texture
+            diffuseColor = glm::vec3(1.0f); 
         }
         else {
-            // No color in material and no diffuse texture, use a default color
+           
             diffuseColor = glm::vec3(0.8f, 0.8f, 0.8f);
         }
     }
 
-    // Load textures
     vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
@@ -166,46 +161,13 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
     return Mesh(vertices, indices, textures, diffuseColor);
+
 }
 
-/*
 vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName) {
 
     vector<Texture> textures;
-    for (GLuint i = 0; i < mat->GetTextureCount(type); i++)
-    {
-        aiString str;
-        mat->GetTexture(type, i, &str);
 
-        bool skip = false;
-        for (GLuint j = 0; j < textures_loaded.size(); j++) {
-            if (std::strcmp(textures_loaded[j].path.data(), str.C_Str()) == 0) {
-
-                textures.push_back(textures_loaded[j]);
-                skip = true;
-                break;
-
-            }
-        }
-
-        if (!skip) {
-
-            Texture texture;
-            texture.id = TextureFromFile(str.C_Str(), this->directory);
-            texture.type = typeName;
-            texture.path = str.C_Str();
-            textures.push_back(texture);
-            textures_loaded.push_back(texture);
-
-        }
-    }
-
-    return textures;
-}
-*/
-
-vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type, string typeName) {
-    vector<Texture> textures;
     for (GLuint i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
@@ -237,6 +199,7 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type,
                 textures.push_back(texture);
         }
         else { 
+
             Texture texture;
             texture.id = TextureFromFile(str.C_Str(), this->directory);
             texture.type = typeName;
@@ -245,9 +208,11 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type,
             cout << texture.path << endl;
 
             textures.push_back(texture);
+
         }
     }
     return textures;
+
 }
 
 
@@ -292,4 +257,5 @@ GLuint TextureFromFile(const char* path, const string& directory, bool gamma) {
     }
 
     return textureID;
+
 }

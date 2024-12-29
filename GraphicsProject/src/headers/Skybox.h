@@ -1,5 +1,5 @@
-#ifndef SKYBOX_CLASS_H
-#define SKYBOX_CLASS_H
+#ifndef SKYBOX_H
+#define SKYBOX_H
 
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
@@ -21,13 +21,18 @@ public:
 
 	Skybox(Shader& shader);
 	void render(Shader& shader, Camera& camera);
-	void deleteBuffers();
+	~Skybox();
 
 private:
 
     const std::string cubeAssets = std::string(PROJECT_ROOT) + "/assets/cubemaps/sky/";
-    std::string cubeFaces[6] = { cubeAssets + "pos_x.jpg", cubeAssets + "neg_x.jpg", cubeAssets + "pos_y.jpg",
-                                cubeAssets + "neg_y.jpg", cubeAssets + "pos_z.jpg", cubeAssets + "neg_z.jpg", };
+
+    std::string cubeFaces[6] = { cubeAssets + "pos_x.jpg", 
+                                 cubeAssets + "neg_x.jpg", 
+                                 cubeAssets + "pos_y.jpg",
+                                 cubeAssets + "neg_y.jpg", 
+                                 cubeAssets + "pos_z.jpg", 
+                                 cubeAssets + "neg_z.jpg" };
 
     GLenum cube[6] = { GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                        GL_TEXTURE_CUBE_MAP_NEGATIVE_X,

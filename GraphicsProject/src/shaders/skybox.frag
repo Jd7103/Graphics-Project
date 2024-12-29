@@ -1,12 +1,13 @@
-#version 410 core
+#version 330 core
 
-in vec3 uv;
+in vec3 texCoords;
 
 uniform samplerCube textureSampler;
 
-out vec4 finalColor;
+out vec4 fragColour;
 
-void main()
-{
-	finalColor = texture(textureSampler, uv);
+void main() {
+
+	fragColour = texture(textureSampler, texCoords);
+	
 }

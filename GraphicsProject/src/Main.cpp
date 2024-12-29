@@ -5,6 +5,8 @@ const unsigned int SCREEN_WIDTH = 1920;
 const unsigned int SCREEN_HEIGHT = 1080;
 
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f), 0.5f, 4000.0f, SCREEN_HEIGHT, SCREEN_WIDTH);
+
+//Mouse Control Vars
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -20,8 +22,9 @@ glm::vec3 lightDir = glm::normalize(glm::vec3(-0.5f, -0.75f, -0.25f));
 
 //Shadow Mapping Params
 GLuint depthFBO, depthMap;
-unsigned int depthMapResolution = 2048;
+unsigned int depthMapResolution = 4096;
 int frameBufferWidth, frameBufferHeight;
+
 
 int main() {
 
@@ -64,23 +67,49 @@ int main() {
     glCullFace(GL_BACK);
     glFrontFace(GL_CCW);
 
+    //Skybox Shader
     std::string vert = std::string(PROJECT_ROOT) + "/src/shaders/skybox.vert";
     std::string frag = std::string(PROJECT_ROOT) + "/src/shaders/skybox.frag";
 
     Shader skyboxShader(vert.c_str(), frag.c_str());
     Skybox skybox(skyboxShader);
+    //Skybox Shader
 
+
+    //Default Instancing Shader
     vert = std::string(PROJECT_ROOT) + "/src/shaders/default.vert";
     frag = std::string(PROJECT_ROOT) + "/src/shaders/default.frag";
 
     Shader shader(vert.c_str(), frag.c_str());
-    Terrain originPlane(shader);
 
-    //std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/spire/spire.gltf";
-    //Model model(modelPath.c_str());
+    shader.use();
+    shader.setVec3("lightDir", lightDir);
+    shader.setInt("depthMap", 1);
+    //Default Instancing Shader
 
-    std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb";
-    //Model building(modelPath.c_str());
+
+    //Spawn Chunk Shader (No Instancing)
+    vert = std::string(PROJECT_ROOT) + "/src/shaders/spawn.vert";
+    frag = std::string(PROJECT_ROOT) + "/src/shaders/spawn.frag";
+    Shader spawnShader(vert.c_str(), frag.c_str());
+
+    spawnShader.use();
+    spawnShader.setVec3("lightDir", lightDir);
+    spawnShader.setInt("depthMap", 1);
+    //Spawn Chunk Shader (No Instancing)
+
+
+    //Road & Footpath Shader
+    vert = std::string(PROJECT_ROOT) + "/src/shaders/roads.vert";
+    frag = std::string(PROJECT_ROOT) + "/src/shaders/roads.frag";
+
+    Shader roadShader = Shader(vert.c_str(), frag.c_str());
+
+    roadShader.use();
+    roadShader.setInt("depthMap", 1);
+    roadShader.setVec3("lightDir", lightDir);
+    //Road & Footpath Shader
+
 
     //Shadow Mapping
     initDepthFBO();
@@ -94,39 +123,31 @@ int main() {
     Shader spawnDepth(vert.c_str(), frag.c_str());
     //Shadow Mapping
 
-    shader.use();
-    shader.setVec3("lightDir", lightDir);
-    shader.setInt("depthMap", 1);
 
+    //Procedural Chunk Generation
     std::vector<std::string> buildingPaths = {
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperA.glb",
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperB.glb",
-    std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperC.glb"
-    //std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperD.glb",
-    //std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperE.glb",
-    //std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb"
+
+        std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperA.glb",
+        std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperB.glb",
+        std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperC.glb",
+        std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperD.glb",
+        std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperE.glb",
+        std::string(PROJECT_ROOT) + "/assets/models/city/skyscraperF.glb"
+
     };
 
-    //modelPath = std::string(PROJECT_ROOT) + "/assets/models/spire/spire.gltf";
-
-    vert = std::string(PROJECT_ROOT) + "/src/shaders/spawn.vert";
-    frag = std::string(PROJECT_ROOT) + "/src/shaders/spawn.frag";
-    Shader spawnShader(vert.c_str(), frag.c_str());
-
-    spawnShader.use();
-    spawnShader.setVec3("lightDir", lightDir);
-    spawnShader.setInt("depthMap", 1);
-
-    Spawn spawn(spawnShader, modelPath);
-    Generator generator(shader, spawnShader, buildingPaths[2]);
-
-    //vert = std::string(PROJECT_ROOT) + "/src/shaders/sph.vert";
-    //frag = std::string(PROJECT_ROOT) + "/src/shaders/sph.frag";
-    //std::unique_ptr<SPH> sphSystem = std::make_unique<SPH>(vert, frag, 15.0f);
+    Generator generator(shader, spawnShader, buildingPaths);
+    //Procedural Chunk Generation
     
-    modelPath = std::string(PROJECT_ROOT) + "/assets/models/gull.glb";
+    
+    //Boids
+    std::string modelPath = std::string(PROJECT_ROOT) + "/assets/models/gull.glb";
+
     BoidManager boidManager(modelPath, shader);
-    boidManager.initialize(100, 500.0f);
+    boidManager.initialize(200, 500.0f);
+    //Boids
+
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -136,6 +157,7 @@ int main() {
         frames++;
         fTime += deltaTime;
         if (fTime >= 2.0f) {
+
             float fps = frames / fTime;
             frames = 0;
             fTime = 0;
@@ -143,61 +165,57 @@ int main() {
             glfwSetWindowTitle(window, newTitle.c_str());
 
             lastFrame = currentFrame;
+
         }
-
-        processInput(window);
-
-        generator.update(camera);
-        boidManager.update(min(deltaTime, 0.08f));
 
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-        glm::vec3 translate = glm::vec3(0.0f, 55.0f, -5.0f);
-        glm::vec3 scale = glm::vec3(10.0f, 10.0f, 10.0f);
-        glm::vec3 rotateAxis = glm::vec3(0.0f, 0.0f, 1.0f);
-        float rotateAngle = 0;
+        //Updates
+        processInput(window);
+        generator.update(camera);
+        boidManager.update(0.08f);
 
-        glm::mat4 modelMatrixTransformed = glm::scale(modelMatrix, scale);
-        modelMatrixTransformed = glm::rotate(modelMatrixTransformed, glm::radians(rotateAngle), rotateAxis);
-        modelMatrixTransformed = glm::translate(modelMatrixTransformed, translate);
+
+        glm::vec3 lightPosition = camera.Position - lightDir * 1000.0f;
+        glm::mat4 lightProjection = glm::ortho(-2500.0f, 2500.0f, -2500.0f, 2500.0f, 700.0f, 4000.0f);
+        glm::mat4 lightView = glm::lookAt(lightPosition, camera.Position, glm::vec3(0.0, 1.0, 0.0));
+        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+        //Updates
+
 
         //Shadow Pass
         depthShader.use();
-
-        float near_plane = 700.0f, far_plane = 2000.0f;
-        glm::vec3 lightPosition = camera.Position - lightDir * 1000.0f;
-        glm::mat4 lightProjection = glm::ortho(-2000.0f, 2000.0f, -2000.0f, 2000.0f, near_plane, far_plane);
-        glm::mat4 lightView = glm::lookAt(lightPosition, camera.Position, glm::vec3(0.0, 1.0, 0.0));
-        glm::mat4 lightSpaceMatrix = lightProjection * lightView;
-
         depthShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
         spawnDepth.use();
         spawnDepth.setMat4("lightSpaceMatrix", lightSpaceMatrix);
         spawnDepth.setMat4("model", glm::mat4(1.0f));
 
+
         glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
         glViewport(0, 0, depthMapResolution, depthMapResolution);
         glClear(GL_DEPTH_BUFFER_BIT);
         glCullFace(GL_FRONT);
 
-        generator.render(depthShader, spawnDepth);
+        generator.render(depthShader, spawnDepth, depthShader);
         boidManager.render(depthShader);
-        //spawn.render(depthShader);
-
+  
         glCullFace(GL_BACK);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         glViewport(0, 0, frameBufferWidth, frameBufferHeight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
         //Shadow Pass
 
-        //saveDepthTexture(depthFBO, "depth.png");
 
         //Regular Pass
+
+        //Default Instancing Shader
         shader.use();
 
         shader.setMat4("model", modelMatrix);
@@ -208,9 +226,23 @@ int main() {
         shader.setVec3("viewPosition", camera.Position);
         shader.setVec3("lightPosition", lightPosition);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
+        shader.setInt("useTexture", 0);
+        //Default Instancing Shader
 
+        //Roads & Footpaths
+        roadShader.use();
+
+        roadShader.setMat4("model", modelMatrix);
+        roadShader.setMat4("view", camera.viewMatrix());
+        roadShader.setMat4("projection", camera.projectionMatrix());
+        roadShader.setMat4("lightSpaceMatrix", lightSpaceMatrix);
+
+        roadShader.setVec3("viewPosition", camera.Position);
+        roadShader.setVec3("lightPosition", lightPosition);
+        //Roads & Footpaths
+
+
+        //Spawn Chunk Shader (No Instancing)
         spawnShader.use();
      
         spawnShader.setMat4("model", modelMatrix);
@@ -220,21 +252,14 @@ int main() {
        
         spawnShader.setVec3("viewPosition", camera.Position);
         spawnShader.setVec3("lightPosition", lightPosition);
-
-        //glActiveTexture(GL_TEXTURE1);
-       // glBindTexture(GL_TEXTURE_2D, depthMap);
+        //Spawn Chunk Shader (No Instancing)
 
 
-        shader.setInt("useTexture", 0);
-        generator.render(shader, spawnShader);
-
+        //Render
+        generator.render(shader, spawnShader, roadShader);
         boidManager.render(shader);
-
-
-        //sphSystem->update(deltaTime);
-        //sphSystem->render(camera.viewMatrix(), camera.projectionMatrix());
-
         skybox.render(skyboxShader, camera);
+        //Render
 
         //Regular
 
@@ -243,19 +268,23 @@ int main() {
 
     }
 
-    originPlane.deleteBuffers();
-    skybox.deleteBuffers();
+    //Cleanup w/ Deconstructors
+    skybox.~Skybox();
+    boidManager.~BoidManager();
+    //Cleanup w/ Deconstructors
     
     glfwTerminate();
     return 0;
 
 }
 
-void processInput(GLFWwindow* window)
-{
+void processInput(GLFWwindow* window) {
+
+    //Terminate Key
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    //Movement Keys
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.processKeyboard(FORWARD);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -272,6 +301,7 @@ void processInput(GLFWwindow* window)
         camera.processKeyboard(FAST);
     else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
         camera.processKeyboard(SLOW);
+
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
@@ -321,8 +351,8 @@ void initDepthFBO() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    float borderColour[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColour);
     
     glBindFramebuffer(GL_FRAMEBUFFER, depthFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -331,22 +361,4 @@ void initDepthFBO() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-}
-
-static void saveDepthTexture(GLuint fbo, std::string filename) {
-    int width =  depthMapResolution;
-    int height = depthMapResolution;
-
-    int channels = 3;
-
-    std::vector<float> depth(width * height);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glReadBuffer(GL_DEPTH_COMPONENT);
-    glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT, GL_FLOAT, depth.data());
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    std::vector<unsigned char> img(width * height * 3);
-    for (int i = 0; i < width * height; ++i) img[3 * i] = img[3 * i + 1] = img[3 * i + 2] = depth[i] * 255;
-
-    stbi_write_png(filename.c_str(), width, height, channels, img.data(), width * channels);
 }

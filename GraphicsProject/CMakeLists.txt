@@ -54,7 +54,7 @@ set(SOURCES
 include_directories(${INCLUDE_DIR} ${HEADER_DIR})
 
 # Add the executable
-add_executable(GraphicsProject ${SOURCES} "src/Illumination.cpp" "src/SPH.cpp" "src/Spawn.cpp" "src/Boid.cpp")
+add_executable(GraphicsProject ${SOURCES}    "src/Boid.cpp")
 
 # Link Dear ImGui and other libraries
 target_link_libraries(GraphicsProject PRIVATE imgui "${LIB_DIR}/glfw3.lib" "${LIB_DIR}/assimp-vc143-mtd.lib" opengl32)

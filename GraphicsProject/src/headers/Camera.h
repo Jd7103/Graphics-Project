@@ -51,8 +51,6 @@ public:
 
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), float near = 0.5f, float far = 2500.0f, unsigned int height = 1080, unsigned int width = 1920, glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
 
-    Camera(float posX, float posY, float posZ, float near, float far, unsigned int height, unsigned int width, float upX, float upY, float upZ, float yaw, float pitch);
-
     glm::mat4 viewMatrix();
 
     glm::mat4 Camera::projectionMatrix();

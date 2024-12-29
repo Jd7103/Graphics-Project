@@ -11,11 +11,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Skybox.h"
-#include "Terrain.h"
 #include "Generator.h"
-#include "Illumination.h"
-#include "SPH.h"
-#include "Spawn.h"
 #include "Boid.h"
 
 #include <iostream>
@@ -26,5 +22,4 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow* window);
 
 void initDepthFBO();
-static void saveDepthTexture(GLuint fbo, std::string filename);
 

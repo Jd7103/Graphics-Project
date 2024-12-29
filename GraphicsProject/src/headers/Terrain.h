@@ -1,5 +1,5 @@
-#ifndef TERRAIN_CLASS_H
-#define TERRAIN_CLASS_H
+#ifndef TERRAIN_H
+#define TERRAIN_H
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -16,7 +16,9 @@
 #include "Model.h"
 
 class Terrain {
+
 public:
+
     Terrain(Shader& shader);
     void renderInstanced(Shader& shader, const std::vector<glm::mat4>& modelMatrices);
     void renderHeightmap(Shader& shader);
@@ -24,39 +26,55 @@ public:
     void generateHeightmapMesh(int resolution = 100);
     void deleteBuffers();
 
+
 private:
+
+
+    //Flat Plane Vertices at the Origin
     float originVertices[12] = {
+
         -500.0f, -50.0f,  500.0f,
          500.0f, -50.0f,  500.0f,
          500.0f, -50.0f, -500.0f,
         -500.0f, -50.0f, -500.0f
+
     };
 
+    //Flat Plane Indices
     GLuint originIndices[6] = {
+
         0, 2, 3,
         2, 0, 1
+
     };
 
+    //Flat Plane Normals (Straight Up)
     float originNormals[12]{
+
         0.0f, 1.0f, 0.0f,
         0.0f, 1.0f, 0.0f,
         0.0f, 1.0f, 0.0f,
         0.0f, 1.0f, 0.0f
+
     };
 
+    //UV Coordinates for a Repeating Grass Texture
     float tileFactor = 100.0f;
 
     float originUVs[8] = {
+
         0.0f, (500.0f / 1000.0f) * tileFactor,
-        (259.0f / 1000.0f) * tileFactor, (500.0f / 1000.0f) * tileFactor,
-        (259.0f / 1000.0f) * tileFactor, 0.0f,
+        (961.0f / 1000.0f) * tileFactor, (500.0f / 1000.0f) * tileFactor,
+        (961.0f / 1000.0f) * tileFactor, 0.0f,
         0.0f, 0.0f
+
     };
 
-    GLuint terrainVAO, terrainVBO, terrainEBO, textureID;
+    GLuint terrainVAO, terrainVBO, terrainEBO, grassID, roadID, pathID;
     GLuint terrainNormal, terrainUV, instanceVBO;
 
-    //Perlin
+
+    //Perlin Noise
 
     GLuint heightmapVAO, heightmapVBO, heightmapEBO;
     GLuint heightmapNormal, heightmapUV;
@@ -68,5 +86,6 @@ private:
     float noise(float x, float y);
     float octaveNoise(float x, float y, int octaves, float persistence);
     std::vector<float> generateHeightMap(int resolution);
+
 };
 #endif

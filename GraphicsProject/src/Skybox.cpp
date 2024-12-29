@@ -5,15 +5,18 @@ Skybox::Skybox(Shader& shader) {
     shader.use();
     shader.setInt("textureSampler", 0);
 
+    //Buffer Setup
     glGenVertexArrays(1, &skyboxVAO);
     glGenBuffers(1, &skyboxVBO);
     glGenBuffers(1, &skyboxEBO);
 
     glBindVertexArray(skyboxVAO);
 
+    //Vertices
     glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
 
+    //Indices 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(skyboxIndices), &skyboxIndices, GL_STATIC_DRAW);
 
@@ -23,7 +26,10 @@ Skybox::Skybox(Shader& shader) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    //Buffer Setup
 
+
+    //Loading Cubemap Textures
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 
@@ -32,7 +38,7 @@ Skybox::Skybox(Shader& shader) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
+    
     int width, height, channels;
     stbi_set_flip_vertically_on_load(false);
     for (int i = 0; i < 6; i++) {
@@ -46,28 +52,34 @@ Skybox::Skybox(Shader& shader) {
         }
         stbi_image_free(img);
     }
+    //Loading Cubemap Textures
+
 }
 
 void Skybox::render(Shader& shader, Camera& camera) {
    
-    glDepthFunc(GL_LEQUAL);  
+    glDepthFunc(GL_LEQUAL); //Different Depth Function to Render Skybox Behind all other Objects
     shader.use();
 
-    glm::mat4 view = glm::mat4(glm::mat3(camera.viewMatrix()));
+    glm::mat4 view = glm::mat4(glm::mat3(camera.viewMatrix())); //Center Skybox on Camera
     shader.setMat4("view", view);
     shader.setMat4("projection", camera.projectionMatrix());
 
     glBindVertexArray(skyboxVAO);
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     
     glBindVertexArray(0);
     glDepthFunc(GL_LESS);
+
 }
 
-void Skybox::deleteBuffers() {
+Skybox::~Skybox() {
+
     glDeleteVertexArrays(1, &skyboxVAO);
     glDeleteBuffers(1, &skyboxVBO);
     glDeleteBuffers(1, &skyboxEBO);
+
 }

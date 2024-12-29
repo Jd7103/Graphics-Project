@@ -3,8 +3,8 @@
 Terrain::Terrain(Shader& shader) {
 
     shader.use();
-    shader.setInt("textureSampler", 0);
 
+    //Buffer Setup
     glGenVertexArrays(1, &terrainVAO);
     glGenBuffers(1, &terrainVBO);
     glGenBuffers(1, &terrainEBO);
@@ -13,21 +13,25 @@ Terrain::Terrain(Shader& shader) {
 
     glBindVertexArray(terrainVAO);
 
+    //Vertices
     glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(originVertices), &originVertices, GL_STATIC_DRAW);
 
+    //Indices
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(originIndices), &originIndices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    //Normals
     glBindBuffer(GL_ARRAY_BUFFER, terrainNormal);
     glBufferData(GL_ARRAY_BUFFER, sizeof(originNormals), originNormals, GL_STATIC_DRAW);
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(1);
 
+    //UV Coords
     glBindBuffer(GL_ARRAY_BUFFER, terrainUV);
     glBufferData(GL_ARRAY_BUFFER, sizeof(originUVs), originUVs, GL_STATIC_DRAW);
 
@@ -37,33 +41,37 @@ Terrain::Terrain(Shader& shader) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    string textureDirectory = string(PROJECT_ROOT) + "/assets/textures/";
-    char* texturePath = "grass.jpg";
-    textureID = TextureFromFile(texturePath, textureDirectory);
-
-    heightmapVAO = 0;
-    heightmapVBO = 0;
-    heightmapEBO = 0;
-    heightmapNormal = 0;
-    heightmapUV = 0;
-    heightmapIndexCount = 0;
+    //Buffer Setup
 
 }
 
 void Terrain::setupInstancedRendering(size_t maxInstances) {
 
+    //Instance Buffer (Contains Transformation Matrices for Tiles)
     glGenBuffers(1, &instanceVBO);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferData(GL_ARRAY_BUFFER, maxInstances * sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
 
     glBindVertexArray(terrainVAO);
 
-    std::size_t vec4Size = sizeof(glm::vec4);
+    //Load Road Texture
+    string textureDirectory = string(PROJECT_ROOT) + "/assets/textures/";
+    char* texturePath = "road.jpg";
+    roadID = TextureFromFile(texturePath, textureDirectory);
+
+    //Load Sidewalk Texture
+    textureDirectory = string(PROJECT_ROOT) + "/assets/textures/";
+    texturePath = "sidewalk.jpg";
+    pathID = TextureFromFile(texturePath, textureDirectory);
+
+    std::size_t vec4Size = sizeof(glm::vec4); //Pre Calculate Size for Effiency
     for (int i = 0; i < 4; i++) {
         glEnableVertexAttribArray(7 + i); 
-        glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4),
-            (void*)(i * vec4Size));
+
+        //Instance Matrix Vertex Data is 4 vec4s in GLSL
+        glVertexAttribPointer(7 + i, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (void*)(i * vec4Size));
+
+        //Advance Vertex Attribue Data Buffers Once Per Instance, Rather than Once Per Vertex
         glVertexAttribDivisor(7 + i, 1);
     }
 
@@ -76,11 +84,23 @@ void Terrain::renderInstanced(Shader& shader, const std::vector<glm::mat4>& mode
 
     if (modelMatrices.empty()) return;
 
+    //Update Instance Buffer with Tile Matrices
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     glBufferSubData(GL_ARRAY_BUFFER, 0, modelMatrices.size() * sizeof(glm::mat4), modelMatrices.data());
 
+    shader.use();
+
+    //Bind Road Texture to GL_TEXTURE0 and Uniform Position 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glBindTexture(GL_TEXTURE_2D, roadID);
+    shader.setInt("roadSampler", 0);
+
+    //Bind Sidewalk Texture to GL_TEXTURE2 (Depth Map is on GL_TEXTURE1) and Uniform Position 2
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, pathID);
+    shader.setInt("pathSampler", 2);
+
+    shader.setInt("depthMap", 1);
 
     glBindVertexArray(terrainVAO);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, modelMatrices.size());
@@ -107,7 +127,39 @@ void Terrain::deleteBuffers() {
 
 
 //Perlin
+
+std::vector<float> Terrain::generateHeightMap(int resolution) {
+
+    std::vector<float> heightMap(resolution * resolution);
+
+    //Random Offsets for Variety
+    float offsetX = static_cast<float>(rand()) / RAND_MAX * 1000.0f;
+    float offsetY = static_cast<float>(rand()) / RAND_MAX * 1000.0f;
+
+
+    //Height Values at Grid Points
+    for (int y = 0; y < resolution; y++) {
+        for (int x = 0; x < resolution; x++) {
+
+            //Scale Points to get Noise Frequency in octaveNoise(...)
+            float sampleX = (x + offsetX) * 0.03f;
+            float sampleY = (y + offsetY) * 0.03f;
+
+            float value = octaveNoise(sampleX, sampleY, 6, 0.5f);
+            value = value * value;
+            heightMap[y * resolution + x] = value * 100.0f;
+        }
+    }
+
+    return heightMap;
+
+}
+
 void Terrain::generateHeightmapMesh(int resolution) {
+
+    string textureDirectory = string(PROJECT_ROOT) + "/assets/textures/";
+    char* texturePath = "grass.jpg";
+    grassID = TextureFromFile(texturePath, textureDirectory);
 
     std::vector<float> heightMap = generateHeightMap(resolution);
     std::vector<float> vertices;
@@ -117,10 +169,10 @@ void Terrain::generateHeightmapMesh(int resolution) {
 
     float gridSize = 1000.0f / (resolution - 1);
 
-    //Vertices
     for (int z = 0; z < resolution; z++) {
         for (int x = 0; x < resolution; x++) {
 
+            //Vertices
             bool isEdge = (x == 0 || x == resolution - 1 || z == 0 || z == resolution - 1);
 
             float xPos = x * gridSize - 500.0f;
@@ -133,6 +185,8 @@ void Terrain::generateHeightmapMesh(int resolution) {
             vertices.push_back(xPos);
             vertices.push_back(yPos);
             vertices.push_back(zPos);
+            //Vertices
+
 
             //Normals
             glm::vec3 normal(0.0f, 1.0f, 0.0f);
@@ -151,10 +205,14 @@ void Terrain::generateHeightmapMesh(int resolution) {
             normals.push_back(-normal.x);
             normals.push_back(-normal.y);
             normals.push_back(-normal.z);
+            //Normals
+
 
             //UV Coordinates
             uvs.push_back(float(x) / (resolution - 1) * 10.0f);
             uvs.push_back(float(z) / (resolution - 1) * 10.0f);
+            //UV Coordinates
+
         }
     }
 
@@ -178,7 +236,7 @@ void Terrain::generateHeightmapMesh(int resolution) {
 
     heightmapIndexCount = indices.size();
 
-    //Buffers
+    //Buffer Setup
     glGenVertexArrays(1, &heightmapVAO);
     glGenBuffers(1, &heightmapVBO);
     glGenBuffers(1, &heightmapEBO);
@@ -187,85 +245,79 @@ void Terrain::generateHeightmapMesh(int resolution) {
 
     glBindVertexArray(heightmapVAO);
 
+    //Vertices
     glBindBuffer(GL_ARRAY_BUFFER, heightmapVBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, heightmapEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, heightmapNormal);
-    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, heightmapUV);
-    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
-
-
-    glBindBuffer(GL_ARRAY_BUFFER, heightmapVBO);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
+    //Indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, heightmapEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    //Normals
     glBindBuffer(GL_ARRAY_BUFFER, heightmapNormal);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), normals.data(), GL_STATIC_DRAW);
+
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(1);
 
+    //UV Coordinates
     glBindBuffer(GL_ARRAY_BUFFER, heightmapUV);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(float), uvs.data(), GL_STATIC_DRAW);
+
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(2);
+    //Buffer Setup
 
-}
-
-std::vector<float> Terrain::generateHeightMap(int resolution) {
-
-    std::vector<float> heightMap(resolution * resolution);
-
-    float offsetX = static_cast<float>(rand()) / RAND_MAX * 1000.0f;
-    float offsetY = static_cast<float>(rand()) / RAND_MAX * 1000.0f;
-
-    for (int y = 0; y < resolution; y++) {
-        for (int x = 0; x < resolution; x++) {
-            float sampleX = (x + offsetX) * 0.03f;
-            float sampleY = (y + offsetY) * 0.03f;
-
-            float value = octaveNoise(sampleX, sampleY, 6, 0.5f);
-            value = value * value;
-            heightMap[y * resolution + x] = value * 100.0f;
-        }
-    }
-
-    return heightMap;
 }
 
 void Terrain::renderHeightmap(Shader& shader) {
+
     shader.use();
+    shader.setInt("useTexture", 1);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    glBindTexture(GL_TEXTURE_2D, grassID);
 
     glBindVertexArray(heightmapVAO);
     glDrawElements(GL_TRIANGLES, heightmapIndexCount, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+
 }
 
+
 //Noise Functions
+
+//Attrib: Ken Perlin, Improving Noise (2002) for 6t^5 - 15t^4 + 10t^3
 float Terrain::fade(float t) {
     return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 }
 
+//Linear Interpolation between a and b, with fade(...) output, t, as Interpolation Parameter
 float Terrain::lerp(float a, float b, float t) {
+
     return a + t * (b - a);
+
 }
 
+//Gradient Calculations using Bit Manipulation
 float Terrain::grad(int hash, float x, float y) {
 
-    int h = hash & 15;
-    float u = h < 8 ? x : y;
-    float v = h < 4 ? y : x;
-    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+    int h = hash & 15; //Get Last 4 bits for 16 Gradient Vector Combinations
+
+    float u = h < 8 ? x : y; //Use 3rd Bit to Determine if u Component of Gradient Vector will be x or y
+
+    float v = h < 4 ? y : x; //Use 2nd Bit to Determine if v Component of Gradient Vector will be x or y
+
+    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v); //Use 1st and 2nd Bits to Detemine the Signs of u and v
 
 }
 
 float Terrain::noise(float x, float y) {
 
-    // Permutation Table from Ken Perlin's Original Implementation
+    // Permutation Table from Ken Perlin's Paper
     static const int p[512] = {
                       151, 160, 137,  91,  90,  15, 131,  13, 201,  95,  96,  53, 194, 233,   7, 225,
                       140,  36, 103,  30,  69, 142,   8,  99,  37, 240,  21,  10,  23, 190,   6, 148,
@@ -285,15 +337,20 @@ float Terrain::noise(float x, float y) {
                       222, 114,  67,  29,  24,  72, 243, 141, 128, 195,  78,  66, 215,  61, 156, 180
     };
 
+    //Integer Hashing
+
+    //Determining Grid Cells
     int X = (int)floor(x) & 255;
     int Y = (int)floor(y) & 255;
 
+    //Position Relative to Grid Cell
     x -= floor(x);
     y -= floor(y);
 
     float u = fade(x);
     float v = fade(y);
 
+    //Hashes for Grid Cell Corners
     int A = p[X] + Y;
     int AA = p[A];
     int AB = p[A + 1];
@@ -301,13 +358,13 @@ float Terrain::noise(float x, float y) {
     int BA = p[B];
     int BB = p[B + 1];
 
-    return lerp(
-        lerp(grad(p[AA], x, y), grad(p[BA], x - 1, y), u),
-        lerp(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u),
-        v);
+    return lerp(lerp(grad(p[AA], x, y), grad(p[BA], x - 1, y), u), lerp(grad(p[AB], x, y - 1), grad(p[BB], x - 1, y - 1), u), v);
 
 }
 
+
+//Attrib: F. Kenton Musgrave, 2 Procedural Fractal Terrains for Fractional Brownian Motion
+//More Octaves = More Detail, Persistance Acts Like a Decay Factor for Amplitude
 float Terrain::octaveNoise(float x, float y, int octaves, float persistence) {
 
     float total = 0.0f;
